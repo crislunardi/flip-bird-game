@@ -68,4 +68,5 @@ h1 {
     font-family: 'Pixel';
     font-size: 70px;
     color: #F4F4F4;
+    z-index: 100;
 }
