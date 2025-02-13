@@ -2,7 +2,7 @@ function createElement(tagName, className) {
     const elem = document.createElement(tagName);
     elem.className = className;
     return elem;
-}
+};
 
 function CreateBarrier(reverse = false) {
     this.element = createElement('div', 'barrier');
@@ -14,7 +14,7 @@ function CreateBarrier(reverse = false) {
     this.element.appendChild(reverse ? border : body);
 
     this.setHeight = height => (body.style.height = `${height}px`);
-}
+};
 
 function PairOfBarriers(height, opening, x) {
     this.element = createElement('div', 'pair-of-barriers');
@@ -39,7 +39,7 @@ function PairOfBarriers(height, opening, x) {
 
     this.drawOpening();
     this.setX(x);
-}
+};
 
 function Barriers(height, width, opening, space, pointNotify = () => {}) {
     this.pairs = [
@@ -67,7 +67,7 @@ function Barriers(height, width, opening, space, pointNotify = () => {}) {
             }
         });
     };
-}
+};
 
 function Bird(gameHeight) {
     let flying = false;
@@ -95,7 +95,7 @@ function Bird(gameHeight) {
     };
 
     this.setY(gameHeight / 2);
-}
+};
 
 const gameArea = document.querySelector('[wm-flappy]');
 const barriers = new Barriers(700, 1200, 200, 400);
