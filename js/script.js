@@ -2,7 +2,7 @@ function createElement(tagName, className) {
     const elem = document.createElement(tagName);
     elem.className = className;
     return elem;
-};
+}
 
 function CreateBarrier(reverse = false) {
     this.element = createElement('div', 'barrier');
@@ -14,7 +14,7 @@ function CreateBarrier(reverse = false) {
     this.element.appendChild(reverse ? border : body);
 
     this.setHeight = height => (body.style.height = `${height}px`);
-};
+}
 
 function PairOfBarriers(height, opening, x) {
     this.element = createElement('div', 'pair-of-barriers');
@@ -39,7 +39,7 @@ function PairOfBarriers(height, opening, x) {
 
     this.drawOpening();
     this.setX(x);
-};
+}
 
 function Barriers(height, width, opening, space, pointNotify = () => {}) {
     this.pairs = [
@@ -67,7 +67,7 @@ function Barriers(height, width, opening, space, pointNotify = () => {}) {
             }
         });
     };
-};
+}
 
 function Bird(gameHeight) {
     let flying = false;
@@ -95,25 +95,64 @@ function Bird(gameHeight) {
     };
 
     this.setY(gameHeight / 2);
-};
+}
 
 function Progress() {
     this.element = createElement('span', 'progress');
     this.updatePoints = points => {
-        this.element.innerHTML = points
-    }
+        this.element.innerHTML = points;
+    };
     this.updatePoints(0);
-};
+}
 
-const gameArea = document.querySelector('[wm-flappy]');
-const barriers = new Barriers(700, 1200, 200, 400);
-const bird = new Bird(700);
+function elementsCollided(elementA, elementB) {
+    const rectA = elementA.getBoundingClientRect();
+    const rectB = elementB.getBoundingClientRect();
 
-gameArea.appendChild(bird.element);
-gameArea.appendChild(new Progress().element);
-barriers.pairs.forEach(pair => gameArea.appendChild(pair.element));
+    const horizontal = rectA.left + rectA.width >= rectB.left && rectB.left + rectB.width >= rectA.left;
+    const vertical = rectA.top + rectA.height >= rectB.top && rectB.top + rectB.height >= rectA.top;
+    
+    return horizontal && vertical;
+}
 
-setInterval(() => {
-    barriers.animate();
-    bird.animate();
-}, 20);
+function collided(bird, barriers) {
+    return barriers.pairs.some(pair => {
+        return elementsCollided(bird.element, pair.upper.element) || 
+               elementsCollided(bird.element, pair.lower.element);
+    });
+}
+
+function FlappyBird() {
+    let points = 0;
+
+    const gameArea = document.querySelector('[wm-flappy]');
+    if (!gameArea) {
+        console.error("Elemento '[wm-flappy]' não encontrado no DOM.");
+        return;
+    }
+
+    const height = gameArea.clientHeight;
+    const width = gameArea.clientWidth;
+
+    const progress = new Progress();
+    const barriers = new Barriers(height, width, 200, 400, () => progress.updatePoints(++points));
+    const bird = new Bird(height);
+
+    gameArea.appendChild(progress.element);
+    gameArea.appendChild(bird.element);
+    barriers.pairs.forEach(pair => gameArea.appendChild(pair.element));
+
+    this.start = () => {
+        const timer = setInterval(() => {
+            barriers.animate();
+            bird.animate();
+
+            if (collided(bird, barriers)) {
+                clearInterval(timer);
+                alert("Game Over!");
+            }
+        }, 20);
+    };
+}
+
+new FlappyBird().start();
